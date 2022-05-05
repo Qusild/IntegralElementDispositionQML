@@ -8,13 +8,14 @@
 #define CROSSBREED_PERCENT 30       //"Сила" смешивания
 #define CROSSBREED_AMOUNT 20        //Процент от поколения который будет спариваться
 
+#define MAX_UNCHANGED 20
 
 /*
     @author WhoLeb
     @param schema схема, какая она сейчас есть.
     @param percent процент изменения особи(целое число)
 */
-std::vector<integral_element> individual_mutation(Schema* schema, int percent);
+std::vector<integral_element> individual_mutation(std::vector<integral_element> elements, int max_x, int max_y, int percent);
 std::vector<integral_element> get_elements(Schema *input_schema);
 
 /*
@@ -23,37 +24,68 @@ std::vector<integral_element> get_elements(Schema *input_schema);
     @param percnet вероятность обмена геном
 */
 std::vector<integral_element> crossbreed(std::vector<integral_element>* first, std::vector<integral_element>* second, int percent);
-std::vector<std::vector<integral_element>> make_generation(std::vector<std::vector<integral_element>>* previous_generation);
+std::vector<std::vector<integral_element>> make_generation(std::vector<std::vector<integral_element>>* previous_generation, int max_x, int max_y);
 
 Schema Back::genetic_update(Schema* input_schema)
 {
-    int primary_len = 0;
+    int best_len = 0;
     for(auto i: input_schema->elements)
     {
         for (auto j: i.connections)
         {
-            primary_len = A_star(input_schema, j);
+            best_len = A_star(input_schema, j);
         }
     }
-
+    std::vector<integral_element> primary_individual = input_schema->elements;
+    std::vector<integral_element> best_individual = primary_individual;
     std::vector<std::vector<integral_element>> last_generation;
-    int min_gen_len = INT_MAX;
+    Schema working_schema(input_schema->dimentions_x, input_schema->dimentions_y);
+
     for (int i = 0; i < GENERATION_LENGTH; i++)
     {
-        std::vector<integral_element> individual = individual_mutation(input_schema, 100);
-        last_generation.emplace_back();
+        std::vector<integral_element> individual = individual_mutation(input_schema->elements, input_schema->dimentions_x, input_schema->dimentions_y,100);
+        last_generation.emplace_back(individual);
+        working_schema.elements = individual;
         for (auto j: individual)
         {
             for(auto k: j.connections)
             {
-                int len = A_star(input_schema, k);
-                if(len < min_gen_len)
-                    min_gen_len = len;
+                int len = A_star(&working_schema, k);
+                if(len < best_len)
+                {
+                    best_len = len;
+                    best_individual = individual;
+                }
             }
         }
     }
-
-
+    int prev_len = best_len;
+    int const_gen = 0;
+    while(const_gen < 20)
+    {
+        working_schema.clear_map();
+        last_generation = make_generation(last_generation, input_schema->dimentions_x, input_schema->dimentions_y);
+        for(auto individual: last_generation)
+        {
+            working_schema.elements = individual;
+            for(auto element: individual)
+            {
+                for(auto connections: element.connections)
+                {
+                    int len = A_star(&working_schema, connections);
+                    if(len < best_len)
+                    {
+                        best_len = len;
+                        best_individual = individual;
+                    }
+                }
+            }
+        }
+        if(prev_len == best_len)
+            const_gen++;
+        else
+            prev_len = best_len;
+    }
 }
 
 std::vector<integral_element> get_elements(Schema* input_schema)
@@ -66,17 +98,17 @@ std::vector<integral_element> get_elements(Schema* input_schema)
     return ret;
 }
 
-std::vector<integral_element> individual_mutation(Schema* schema, int percent)
+//Переделать, чтобы не создавалась копия вектора
+std::vector<integral_element> individual_mutation(std::vector<integral_element> *elements, int max_x, int max_y, int percent)
 {
     srand(std::time(NULL));
     std::vector<integral_element> individual;
-    std::vector<integral_element> schem_elements = get_elements(schema);
-    for (auto i: schem_elements)
+    for (auto i: *elements)
     {
         if(rand()%100 < percent)
         {
-            i.coords.x = rand() % schema->dimentions_x;
-            i.coords.y = rand() % schema->dimentions_y;
+            i.coords.x = rand() % max_x;
+            i.coords.y = rand() % max_y;
         }
         individual.emplace_back(i);
     }
@@ -99,12 +131,30 @@ std::vector<integral_element> crossbreed(std::vector<integral_element>* first, s
     return ret;
 }
 
-std::vector<std::vector<integral_element>> make_generation(Schema* input_schema)
+std::vector<std::vector<integral_element>> make_generation(std::vector<std::vector<integral_element>>& previous_generation, int max_x, int max_y)
 {
     std::vector<std::vector<integral_element>> ret;
     srand(std::time(NULL));
     for (int i = 0; i < GENERATION_LENGTH; i++)
     {
-        
+        if(rand() % 100 < MUTATION_AMOUNT)
+        {
+            std::vector<integral_element> s = individual_mutation(&previous_generation[i], max_x, max_y, MUTATION_PERCENT);
+            ret.emplace_back(s);
+            continue;
+        }
+        if(rand()%100 < CROSSBREED_AMOUNT)
+        {
+            int j = rand() % GENERATION_LENGTH;
+            while(j == i)
+            {
+                int j = rand() % GENERATION_LENGTH;
+            }
+            std::vector<integral_element> s = crossbreed(&previous_generation[i], &previous_generation[j], CROSSBREED_PERCENT);
+            ret.emplace_back(s);
+            continue;
+        }
+        ret.emplace_back(previous_generation[i]);
     }
+    return ret;
 }

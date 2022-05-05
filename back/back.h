@@ -35,7 +35,16 @@ public:
     int dimentions_x, dimentions_y;
     std::vector<integral_element> elements;
     std::vector<std::vector<int>> schema_map;
+
+    void clear_map();
 };
+
+void Schema::clear_map()
+{
+    for(auto i: schema_map)
+        for(auto j: i)
+            j = 0;
+}
 
 class Back
 {
