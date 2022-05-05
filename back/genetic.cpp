@@ -61,7 +61,7 @@ Schema Back::genetic_update(Schema* input_schema)
     }
     int prev_len = best_len;
     int const_gen = 0;
-    while(const_gen < 20)
+    while(const_gen < MAX_UNCHANGED)
     {
         working_schema.clear_map();
         last_generation = make_generation(last_generation, input_schema->dimentions_x, input_schema->dimentions_y);
@@ -84,7 +84,10 @@ Schema Back::genetic_update(Schema* input_schema)
         if(prev_len == best_len)
             const_gen++;
         else
+        {
             prev_len = best_len;
+            const_gen = 0;
+        }
     }
 }
 
