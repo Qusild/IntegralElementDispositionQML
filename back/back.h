@@ -37,15 +37,6 @@ public:
     std::vector<std::vector<int>> schema_map;
 };
 
-struct A_star_ret
-{
-    A_star_ret(Schema s, int len)
-        : schema(s), path_len(len){};
-
-    Schema schema;
-    int path_len;
-};
-
 class Back
 {
 public:
@@ -55,5 +46,5 @@ public:
     Schema genetic_update(Schema*);
 
 private:
-    A_star_ret A_star(Schema, connection);
+    int A_star(Schema*, connection);
 };
