@@ -35,16 +35,16 @@ public:
     int dimentions_x, dimentions_y;
     std::vector<integral_element> elements;
     std::vector<std::vector<int>> schema_map;
+
+    void clear_map();
 };
 
-struct A_star_ret
+void Schema::clear_map()
 {
-    A_star_ret(Schema s, int len)
-        : schema(s), path_len(len){};
-
-    Schema schema;
-    int path_len;
-};
+    for(auto i: schema_map)
+        for(auto j: i)
+            j = 0;
+}
 
 class Back
 {
@@ -55,5 +55,5 @@ public:
     Schema genetic_update(Schema*);
 
 private:
-    A_star_ret A_star(Schema, connection);
+    int A_star(Schema*, connection);
 };

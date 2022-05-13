@@ -2,86 +2,162 @@
 #include <random>
 #include <ctime>
 
-std::vector<coordinates> generate_individual(int len,int limit_x, int limit_y);
+#define GENERATION_LENGTH 200
+#define MUTATION_PERCENT 30         //"Сила" мутации
+#define MUTATION_AMOUNT 20          //Процент от поколения который мутирует
+#define CROSSBREED_PERCENT 30       //"Сила" смешивания
+#define CROSSBREED_AMOUNT 20        //Процент от поколения который будет спариваться
+
+#define MAX_UNCHANGED 20
+
+/*
+    @author WhoLeb
+    @param schema схема, какая она сейчас есть.
+    @param percent процент изменения особи(целое число)
+*/
+std::vector<integral_element> individual_mutation(std::vector<integral_element> elements, int max_x, int max_y, int percent);
+std::vector<integral_element> get_elements(Schema *input_schema);
+
+/*
+    @author WhoLeb
+    @param first,second родители
+    @param percnet вероятность обмена геном
+*/
+std::vector<integral_element> crossbreed(std::vector<integral_element>* first, std::vector<integral_element>* second, int percent);
+std::vector<std::vector<integral_element>> make_generation(std::vector<std::vector<integral_element>>* previous_generation, int max_x, int max_y);
 
 Schema Back::genetic_update(Schema* input_schema)
 {
-    std::vector<coordinates> elements_coordinates;
-    int k = 0;
+    int best_len = 0;
     for(auto i: input_schema->elements)
     {
-        elements_coordinates.push_back(i.coords);
-        k++;
-    }
-    std::vector<std::vector<connection>> connects;
-    k = 0;
-    for(auto i: input_schema->elements)
-    {
-        connects.push_back(i.connections);
-        k++;
-    }
-    int number_of_elements = k+1;
-
-    Schema temp_schema = *input_schema;
-
-    int initial_length = 0;
-    for (int i = 0; i < k; i++)
-    {
-        for(auto j : connects[i])
+        for (auto j: i.connections)
         {
-            A_star_ret temp_ret = A_star(temp_schema, j);
-            initial_length += temp_ret.path_len;
-            temp_schema = temp_ret.schema;
+            best_len = A_star(input_schema, j);
         }
     }
-    
-    std::vector<std::vector<coordinates>> initial_generation;
-    std::vector<A_star_ret> individual_path_and_length;
-    for (int i = 0; i < 200; i++)
-    {
-        temp_schema = *input_schema;
-        std::vector<coordinates> individual = generate_individual(k, input_schema->dimentions_x, input_schema->dimentions_y);
-        initial_generation.push_back(individual);
+    std::vector<integral_element> primary_individual = input_schema->elements;
+    std::vector<integral_element> best_individual = primary_individual;
+    std::vector<std::vector<integral_element>> last_generation;
+    Schema working_schema(input_schema->dimentions_x, input_schema->dimentions_y);
 
-        int c = 0;
-        for(auto j: individual)
+    for (int i = 0; i < GENERATION_LENGTH; i++)
+    {
+        std::vector<integral_element> individual = individual_mutation(input_schema->elements, input_schema->dimentions_x, input_schema->dimentions_y,100);
+        last_generation.emplace_back(individual);
+        working_schema.elements = individual;
+        for (auto j: individual)
         {
-            temp_schema.elements[c].coords = j;
-            c++;
-        }
-        int temp_individual_length = 0;
-        for (int l = 0; l < k; l++)
-            for (auto j : connects[l])
+            for(auto k: j.connections)
             {
-                A_star_ret temp_ret = A_star(temp_schema, j);
-                temp_individual_length += temp_ret.path_len;
-                temp_schema = temp_ret.schema;
+                int len = A_star(&working_schema, k);
+                if(len < best_len)
+                {
+                    best_len = len;
+                    best_individual = individual;
+                }
             }
-        individual_path_and_length.push_back({temp_schema, temp_individual_length});
-    }
-
-    int min_path = 100000;
-    int min_path_place;
-    for (int i = 0; i < 200; i++)
-    {
-        if(individual_path_and_length[i].path_len < min_path)
-        {
-            min_path_place = i;
-            min_path = individual_path_and_length[i].path_len;
         }
     }
-    return individual_path_and_length[min_path_place].schema;
+    int prev_len = best_len;
+    int const_gen = 0;
+    while(const_gen < MAX_UNCHANGED)
+    {
+        working_schema.clear_map();
+        last_generation = make_generation(last_generation, input_schema->dimentions_x, input_schema->dimentions_y);
+        for(auto individual: last_generation)
+        {
+            working_schema.elements = individual;
+            for(auto element: individual)
+            {
+                for(auto connections: element.connections)
+                {
+                    int len = A_star(&working_schema, connections);
+                    if(len < best_len)
+                    {
+                        best_len = len;
+                        best_individual = individual;
+                    }
+                }
+            }
+        }
+        if(prev_len == best_len)
+            const_gen++;
+        else
+        {
+            prev_len = best_len;
+            const_gen = 0;
+        }
+    }
 }
 
-std::vector<coordinates> generate_individual(int len, int limit_x, int limit_y)
+std::vector<integral_element> get_elements(Schema* input_schema)
+{
+    std::vector<integral_element> ret;
+    for(auto i:input_schema->elements)
+    {
+        ret.emplace_back(i);
+    }
+    return ret;
+}
+
+//Переделать, чтобы не создавалась копия вектора
+std::vector<integral_element> individual_mutation(std::vector<integral_element> *elements, int max_x, int max_y, int percent)
 {
     srand(std::time(NULL));
-    std::vector<coordinates> individual;
-    for(int i = 0; i < len; i++)
+    std::vector<integral_element> individual;
+    for (auto i: *elements)
     {
-        int x = rand() % limit_x;
-        int y = rand() % limit_y;
-        individual.push_back({x, y});
+        if(rand()%100 < percent)
+        {
+            i.coords.x = rand() % max_x;
+            i.coords.y = rand() % max_y;
+        }
+        individual.emplace_back(i);
     }
     return individual;
+}
+
+std::vector<integral_element> crossbreed(std::vector<integral_element>* first, std::vector<integral_element>* second, int percent)
+{
+    srand(std::time(NULL));
+    std::vector<integral_element> ret;
+    for (int i = 0; i < first->size(); i++)
+    {
+        if(rand()%100 < percent)
+        {
+            ret.emplace_back(second[i]);
+        }
+        else
+            ret.emplace_back(first[i]);
+    }
+    return ret;
+}
+
+std::vector<std::vector<integral_element>> make_generation(std::vector<std::vector<integral_element>>& previous_generation, int max_x, int max_y)
+{
+    std::vector<std::vector<integral_element>> ret;
+    srand(std::time(NULL));
+    for (int i = 0; i < GENERATION_LENGTH; i++)
+    {
+        if(rand() % 100 < MUTATION_AMOUNT)
+        {
+            std::vector<integral_element> s = individual_mutation(&previous_generation[i], max_x, max_y, MUTATION_PERCENT);
+            ret.emplace_back(s);
+            continue;
+        }
+        if(rand()%100 < CROSSBREED_AMOUNT)
+        {
+            int j = rand() % GENERATION_LENGTH;
+            while(j == i)
+            {
+                int j = rand() % GENERATION_LENGTH;
+            }
+            std::vector<integral_element> s = crossbreed(&previous_generation[i], &previous_generation[j], CROSSBREED_PERCENT);
+            ret.emplace_back(s);
+            continue;
+        }
+        ret.emplace_back(previous_generation[i]);
+    }
+    return ret;
 }
