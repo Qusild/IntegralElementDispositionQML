@@ -95,4 +95,5 @@ int Back::A_star(Schema *schema, connection conn)
             return -999999;
         }
     }
+    return current_path;
 }
