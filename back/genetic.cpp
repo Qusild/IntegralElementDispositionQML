@@ -58,6 +58,7 @@ Schema Back::genetic_update(Schema* input_schema)
                 }
             }
         }
+        working_schema.clear_map();
     }
     int prev_len = best_len;
     int const_gen = 0;

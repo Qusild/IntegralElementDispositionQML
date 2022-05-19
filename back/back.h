@@ -5,14 +5,23 @@
 
 struct coordinates
 {
+public:
+    coordinates(int x1, int y1)
+        : x(x1), y(y1) {}
     int x, y;
+    bool operator ==(coordinates& other)
+    {
+        return x == other.x && y == other.y;
+    }
 };
 
 struct connection
 {
+public:
     int initial, final;
     std::string name;
-    std::vector<coordinates> path;
+    int id;
+    // std::vector<coordinates> path;
 };
 
 class integral_element
@@ -23,6 +32,7 @@ public:
 
     coordinates coords;
     std::string name;
+    int id;
     std::vector<connection> connections;
 };
 
@@ -36,6 +46,8 @@ public:
     std::vector<integral_element> elements;
     std::vector<std::vector<int>> schema_map;
 
+    integral_element *find(int id);
+
     void clear_map();
 };
 
@@ -44,6 +56,13 @@ void Schema::clear_map()
     for(auto i: schema_map)
         for(auto j: i)
             j = 0;
+}
+
+integral_element* Schema::find(int id)
+{
+    for(auto i: elements)
+        if(i.id == id)
+            return &i;
 }
 
 class Back
