@@ -51,6 +51,8 @@ Schema Back::genetic_update(Schema* input_schema)
             for(auto k: j.connections)
             {
                 int len = A_star(&working_schema, k);
+                if(len < 0)
+                    goto label;
                 if(len < best_len)
                 {
                     best_len = len;
@@ -58,6 +60,7 @@ Schema Back::genetic_update(Schema* input_schema)
                 }
             }
         }
+    label:
         working_schema.clear_map();
     }
     int prev_len = best_len;
@@ -74,6 +77,8 @@ Schema Back::genetic_update(Schema* input_schema)
                 for(auto connections: element.connections)
                 {
                     int len = A_star(&working_schema, connections);
+                    if(len < 0)
+                        goto label2;
                     if(len < best_len)
                     {
                         best_len = len;
@@ -82,7 +87,9 @@ Schema Back::genetic_update(Schema* input_schema)
                 }
             }
         }
-        if(prev_len == best_len)
+    label2:
+        working_schema.clear_map();
+        if (prev_len == best_len)
             const_gen++;
         else
         {
