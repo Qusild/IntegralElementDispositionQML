@@ -97,6 +97,7 @@ Schema Back::genetic_update(Schema* input_schema)
             const_gen = 0;
         }
     }
+    return working_schema;
 }
 
 std::vector<integral_element> get_elements(Schema* input_schema)
