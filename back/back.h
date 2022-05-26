@@ -1,3 +1,4 @@
+#pragma once
 #include <array>
 #include <unordered_map>
 #include <vector>
@@ -28,7 +29,7 @@ class integral_element
 {
 public:
     integral_element(int x, int y)
-        : coords({x, y}){};
+        : coords({ x, y }) {};
 
     coordinates coords;
     std::string name;
@@ -40,39 +41,33 @@ class Schema
 {
 public:
     Schema(int x, int y)
-        : dimentions_x(x), dimentions_y(y){};
+        : dimentions_x(x), dimentions_y(y) {
+        for (int i = 0; i < dimentions_x; i++)
+        {
+            std::vector<int> temp_vec;
+            for (int j = 0; j < dimentions_y; j++)
+                temp_vec.push_back(0);
+            schema_map.push_back(temp_vec);
+        }
+    };
 
     int dimentions_x, dimentions_y;
     std::vector<integral_element> elements;
     std::vector<std::vector<int>> schema_map;
 
-    integral_element *find(int id);
+    integral_element* find(int id);
 
     void clear_map();
 };
 
-void Schema::clear_map()
-{
-    for(auto i: schema_map)
-        for(auto j: i)
-            j = 0;
-}
-
-integral_element* Schema::find(int id)
-{
-    for(auto i: elements)
-        if(i.id == id)
-            return &i;
-}
-
 class Back
 {
 public:
-    Schema *read_file(std::string filename);
+    Schema* read_file(std::string filename);
     int write_file(Schema);
 
-    Schema genetic_update(Schema*);
+    static Schema genetic_update(Schema*);
 
 private:
-    int A_star(Schema*, connection);
+    static int A_star(Schema*, connection);
 };
