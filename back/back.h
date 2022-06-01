@@ -19,6 +19,11 @@ public:
 struct connection
 {
 public:
+    connection(int ini, int fin, int id)
+        : initial(ini), final(fin), id(id){}
+    connection(int ini, int fin, int id, std::string name)
+        : initial(ini), final(fin), id(id), name(name) {}
+
     int initial, final;
     std::string name;
     int id;
@@ -31,8 +36,12 @@ public:
 class integral_element
 {
 public:
-    integral_element(int x, int y)
-        : coords({ x, y }) {};
+    /*integral_element(int x, int y)
+        : coords({ x, y }) {}*/
+    integral_element(int x, int y, int id)
+        : coords({ x, y }), id(id) {}
+    integral_element(int x, int y, int id, std::string n)
+        : coords({ x, y }), id(id), name(n) {}
 
     coordinates coords;
     std::string name;
