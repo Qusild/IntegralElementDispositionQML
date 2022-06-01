@@ -1,28 +1,27 @@
 #include "back.h"
-#include <algorithm>
 #include <random>
 #include <ctime>
 
-#define GENERATION_LENGTH 200
-#define MUTATION_PERCENT 40         //"РЎРёР»Р°" РјСѓС‚Р°С†РёРё
-#define MUTATION_AMOUNT 70          //РџСЂРѕС†РµРЅС‚ РѕС‚ РїРѕРєРѕР»РµРЅРёСЏ РєРѕС‚РѕСЂС‹Р№ РјСѓС‚РёСЂСѓРµС‚
-#define CROSSBREED_PERCENT 40       //"РЎРёР»Р°" СЃРјРµС€РёРІР°РЅРёСЏ
-#define CROSSBREED_AMOUNT 20        //РџСЂРѕС†РµРЅС‚ РѕС‚ РїРѕРєРѕР»РµРЅРёСЏ РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ СЃРїР°СЂРёРІР°С‚СЊСЃСЏ
+#define GENERATION_LENGTH 1
+#define MUTATION_PERCENT 40         //"Сила" мутации
+#define MUTATION_AMOUNT 70          //Процент от поколения который мутирует
+#define CROSSBREED_PERCENT 40       //"Сила" смешивания
+#define CROSSBREED_AMOUNT 20        //Процент от поколения который будет спариваться
 
-#define MAX_UNCHANGED 20
+#define MAX_UNCHANGED  1
 
 /*
     @author WhoLeb
-    @param schema СЃС…РµРјР°, РєР°РєР°СЏ РѕРЅР° СЃРµР№С‡Р°СЃ РµСЃС‚СЊ.
-    @param percent РїСЂРѕС†РµРЅС‚ РёР·РјРµРЅРµРЅРёСЏ РѕСЃРѕР±Рё(С†РµР»РѕРµ С‡РёСЃР»Рѕ)
+    @param schema схема, какая она сейчас есть.
+    @param percent процент изменения особи(целое число)
 */
 std::vector<integral_element> individual_mutation(std::vector<integral_element>& elements, int max_x, int max_y, int percent);
 std::vector<integral_element> get_elements(Schema* input_schema);
 
 /*
     @author WhoLeb
-    @param first,second СЂРѕРґРёС‚РµР»Рё
-    @param percnet РІРµСЂРѕСЏС‚РЅРѕСЃС‚СЊ РѕР±РјРµРЅР° РіРµРЅРѕРј
+    @param first,second родители
+    @param percnet вероятность обмена геном
 */
 std::vector<integral_element> crossbreed(std::vector<integral_element>& first, std::vector<integral_element>& second, int percent);
 std::vector<std::vector<integral_element>> make_generation(std::vector<std::vector<integral_element>>& previous_generation, int max_x, int max_y);
@@ -102,7 +101,7 @@ Schema Back::genetic_update(Schema* input_schema)
     }
     for (auto i : best_individual)
     {
-        working_schema.schema_map[i.coords.x][i.coords.y] = i.id;
+        working_schema.schema_map[i.coords.y][i.coords.x] = i.id;
     }
     return working_schema;
 }
@@ -117,7 +116,7 @@ std::vector<integral_element> get_elements(Schema* input_schema)
     return ret;
 }
 
-//РџРµСЂРµРґРµР»Р°С‚СЊ, С‡С‚РѕР±С‹ РЅРµ СЃРѕР·РґР°РІР°Р»Р°СЃСЊ РєРѕРїРёСЏ РІРµРєС‚РѕСЂР°
+//Переделать, чтобы не создавалась копия вектора
 std::vector<integral_element> individual_mutation(std::vector<integral_element>& elements, int max_x, int max_y, int percent)
 {
     srand(std::time(NULL));
@@ -191,26 +190,4 @@ integral_element* find_by_coords(coordinates& coords, std::vector<integral_eleme
             return &i;
     }
     return nullptr;
-}
-
-void Back::add_element(const integral_element& new_element, Schema& schema)
-{
-    schema.elements.push_back(new_element);
-}
-
-void Back::remove_element(integral_element& element, Schema& schema)
-{
-    if(&element)
-        schema.elements.erase(std::find(schema.elements.begin(), schema.elements.end(), element));
-}
-
-void Back::add_connection(const connection& conn, Schema& schema)
-{
-    schema.find(conn.initial)->connections.push_back(conn);
-}
-
-void Back::remove_connection(const integral_element& element, connection& conn)
-{
-    if(conn)
-        element.connections.erase(std::find(element.connections.begin(), element.connections.end(), conn));
 }

@@ -14,9 +14,17 @@ inline bool is_dest(coordinates& current, coordinates& dest)
 int is_invalid(Schema* schema, coordinates place)
 {
     int retval = 0;
-    if(place.x > 0 && place.y > 0 && place.x < schema->dimentions_x-1 && place.y < schema->dimentions_y - 1)
-    retval = schema->schema_map[place.x][place.y] != 0;
-    retval <<= 1;
+    if (place.x < 0 || place.y < 0 || place.x > schema->dimentions_x - 1 || place.y > schema->dimentions_y - 1)
+    {
+        retval = 1;
+        retval <<= 1;
+        return -retval;
+    }
+    else
+    {
+        retval ^= schema->schema_map[place.y][place.x] != 0;
+        retval <<= 1;
+    }
     retval ^= place.x >= schema->dimentions_x;
     retval <<= 1;
     retval ^= place.y >= schema->dimentions_y;
@@ -41,7 +49,7 @@ int Back::A_star(Schema* schema, connection conn)
     while (!is_dest(current_place, ending_coord))
     {
         int best_path = INT_MAX;
-        int choice;
+        int choice = 0;
         int p = manhatton(current_place.x, current_place.y - 1, ending_coord.x, ending_coord.y);
         if (!is_invalid(schema, coordinates(current_place.x, current_place.y - 1)) && p + current_path < best_path)
         {
@@ -70,28 +78,29 @@ int Back::A_star(Schema* schema, connection conn)
         switch (choice)
         {
         case 1:
-            schema->schema_map[current_place.x][current_place.y - 1] = conn.id;
+            schema->schema_map[current_place.y - 1][current_place.x] = conn.id;
             current_place = coordinates(current_place.x, current_place.y - 1);
             current_path += 1;
             break;
         case 2:
-            schema->schema_map[current_place.x + 1][current_place.y] = conn.id;
+            schema->schema_map[current_place.y][current_place.x + 1] = conn.id;
             current_place = coordinates(current_place.x + 1, current_place.y);
             current_path += 1;
             break;
         case 3:
-            schema->schema_map[current_place.x][current_place.y + 1] = conn.id;
+            schema->schema_map[current_place.y + 1][current_place.x] = conn.id;
             current_place = coordinates(current_place.x, current_place.y + 1);
             current_path += 1;
             break;
         case 4:
-            schema->schema_map[current_place.x - 1][current_place.y] = conn.id;
+            schema->schema_map[current_place.y][current_place.x - 1] = conn.id;
             current_path += 1;
             current_place = coordinates(current_place.x - 1, current_place.y);
             break;
         default:
             return -999999;
         }
+        if (current_path > 300000) return -11111111;
     }
     return current_path;
 }

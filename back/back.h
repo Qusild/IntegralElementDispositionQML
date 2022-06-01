@@ -42,10 +42,10 @@ class Schema
 public:
     Schema(int x, int y)
         : dimentions_x(x), dimentions_y(y) {
-        for (int i = 0; i < dimentions_x; i++)
+        for (int i = 0; i < dimentions_y; i++)
         {
             std::vector<int> temp_vec;
-            for (int j = 0; j < dimentions_y; j++)
+            for (int j = 0; j < dimentions_x; j++)
                 temp_vec.push_back(0);
             schema_map.push_back(temp_vec);
         }
@@ -65,11 +65,6 @@ class Back
 public:
     Schema* read_file(std::string filename);
     int write_file(Schema);
-
-    void add_element(const integral_element& new_element, Schema& schema);
-    void remove_element(integral_element& element, Schema& schema);
-    void add_connection(const connection& conn, Schema& schema);
-    void remove_connection(const integral_element& element, connection& conn);
 
     static Schema genetic_update(Schema*);
 
