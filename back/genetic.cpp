@@ -191,3 +191,13 @@ integral_element* find_by_coords(coordinates& coords, std::vector<integral_eleme
     }
     return nullptr;
 }
+
+void Back::add_element(const integral_element& new_element, Schema& schema)
+{
+    schema.elements.push_back(new_element);
+}
+
+void Back::add_connection(const connection& conn, Schema& schema)
+{
+    schema.find(conn.initial)->connections.push_back(conn);
+}
