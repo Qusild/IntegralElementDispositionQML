@@ -21,8 +21,11 @@ int main()
     temp_connection.initial = 12;
     temp_connection.final = 11;
     temp_connection.id = 2;
-    temp_element2.connections.push_back(temp_connection);
-    test_schema.elements.push_back(temp_element2);
+    /*temp_element2.connections.push_back(temp_connection);
+    test_schema.elements.push_back(temp_element2);*/
+    temp_element2.add_connection(temp_connection);
+    test_schema.add_element(temp_element2);
+    
     
 
     Schema new_schema = Back::genetic_update(&test_schema);

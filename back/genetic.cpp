@@ -1,4 +1,6 @@
 #include "back.h"
+
+#include <algorithm>
 #include <random>
 #include <ctime>
 
@@ -190,4 +192,26 @@ integral_element* find_by_coords(coordinates& coords, std::vector<integral_eleme
             return &i;
     }
     return nullptr;
+}
+
+void Schema::add_element(const integral_element& new_element)
+{
+    elements.push_back(new_element);
+}
+
+void Schema::remove_element(integral_element& element)
+{
+    if (&element)
+        elements.erase(std::find(elements.begin(), elements.end(), element));
+}
+
+void integral_element::add_connection(const connection& conn)
+{
+    connections.push_back(conn);
+}
+
+
+void integral_element::remove_connection(connection& conn)
+{
+    connections.erase(std::find(connections.begin(), connections.end(), conn));
 }

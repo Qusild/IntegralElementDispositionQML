@@ -22,7 +22,10 @@ public:
     int initial, final;
     std::string name;
     int id;
-    // std::vector<coordinates> path;
+
+public:
+    bool operator==(const connection& other) { return this->id == other.id; }
+    bool operator==(const connection& other) const { return this->id == other.id; }
 };
 
 class integral_element
@@ -35,6 +38,14 @@ public:
     std::string name;
     int id;
     std::vector<connection> connections;
+
+
+public:
+    bool operator==(const integral_element& other) { return this->id == other.id; }
+    bool operator==(const integral_element& other) const { return this->id == other.id; }
+
+    void add_connection(const connection& conn);
+    void remove_connection(connection& conn);
 };
 
 class Schema
@@ -55,6 +66,10 @@ public:
     std::vector<integral_element> elements;
     std::vector<std::vector<int>> schema_map;
 
+    void add_element(const integral_element& new_element);
+    void remove_element(integral_element& element);
+
+
     integral_element* find(int id);
 
     void clear_map();
@@ -65,6 +80,8 @@ class Back
 public:
     Schema* read_file(std::string filename);
     int write_file(Schema);
+
+  
 
     static Schema genetic_update(Schema*);
 
