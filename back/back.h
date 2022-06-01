@@ -65,8 +65,11 @@ class Back
 public:
     Schema* read_file(std::string filename);
     int write_file(Schema);
+
     void add_element(const integral_element& new_element, Schema& schema);
+    void remove_element(integral_element& element, Schema& schema);
     void add_connection(const connection& conn, Schema& schema);
+    void remove_connection(const integral_element& element, connection& conn);
 
     static Schema genetic_update(Schema*);
 

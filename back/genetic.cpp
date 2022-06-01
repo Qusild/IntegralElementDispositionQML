@@ -1,4 +1,5 @@
 #include "back.h"
+#include <algorithm>
 #include <random>
 #include <ctime>
 
@@ -197,7 +198,19 @@ void Back::add_element(const integral_element& new_element, Schema& schema)
     schema.elements.push_back(new_element);
 }
 
+void Back::remove_element(integral_element& element, Schema& schema)
+{
+    if(&element)
+        schema.elements.erase(std::find(schema.elements.begin(), schema.elements.end(), element));
+}
+
 void Back::add_connection(const connection& conn, Schema& schema)
 {
     schema.find(conn.initial)->connections.push_back(conn);
+}
+
+void Back::remove_connection(const integral_element& element, connection& conn)
+{
+    if(conn)
+        element.connections.erase(std::find(element.connections.begin(), element.connections.end(), conn));
 }
