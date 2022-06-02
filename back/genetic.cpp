@@ -52,9 +52,9 @@ Schema Back::genetic_update(Schema* input_schema)
         std::vector<integral_element> individual = individual_mutation(input_schema->elements, input_schema->dimentions_x, input_schema->dimentions_y, 100);
         last_generation.emplace_back(individual);
         working_schema.elements = individual;
+        int len = 0;
         for (auto j : individual)
         {
-            int len = 0;
             for (auto k : j.connections)
             {
                 len += A_star(&working_schema, k);
@@ -78,9 +78,9 @@ Schema Back::genetic_update(Schema* input_schema)
         for (auto individual : last_generation)
         {
             working_schema.elements = individual;
+            int len = 0;
             for (auto element : individual)
             {
-                int len = 0;
                 for (auto connections : element.connections)
                 {
                     len += A_star(&working_schema, connections);

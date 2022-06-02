@@ -97,3 +97,5 @@ public:
 private:
     static int A_star(Schema*, connection);
 };
+
+int is_invalid(Schema* schema, coordinates place);

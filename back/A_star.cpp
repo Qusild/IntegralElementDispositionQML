@@ -18,7 +18,6 @@ int is_invalid(Schema* schema, coordinates place)
     {
         retval = 1;
         retval <<= 1;
-        return -retval;
     }
     else
     {
@@ -100,7 +99,7 @@ int Back::A_star(Schema* schema, connection conn)
         default:
             return -999999;
         }
-        if (current_path > 300000) return -11111111;
+        if (current_path > 300) return -11111111;
     }
     return current_path;
 }
