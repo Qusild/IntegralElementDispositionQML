@@ -115,7 +115,7 @@ integral_element* Schema::find(int id)
 
 void Schema::clear_map()
 {
-    for (auto i : schema_map)
-        for (auto j : i)
-            j = 0;
+    for (int y = 0; y < dimentions_y; y++)
+        for (int x = 0; x < dimentions_x; x++)
+            schema_map[y][x] = 0;
 }

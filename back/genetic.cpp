@@ -4,13 +4,13 @@
 #include <random>
 #include <ctime>
 
-#define GENERATION_LENGTH 1
+#define GENERATION_LENGTH 300
 #define MUTATION_PERCENT 40         //"Сила" мутации
 #define MUTATION_AMOUNT 70          //Процент от поколения который мутирует
 #define CROSSBREED_PERCENT 40       //"Сила" смешивания
 #define CROSSBREED_AMOUNT 20        //Процент от поколения который будет спариваться
 
-#define MAX_UNCHANGED  1
+#define MAX_UNCHANGED  20
 
 /*
     @author WhoLeb
@@ -37,12 +37,14 @@ Schema Back::genetic_update(Schema* input_schema)
     {
         for (auto j : i.connections)
         {
-            best_len = A_star(input_schema, j);
+            best_len += A_star(input_schema, j);
         }
     }
     std::vector<integral_element> primary_individual = input_schema->elements;
     std::vector<integral_element> best_individual = primary_individual;
     std::vector<std::vector<integral_element>> last_generation;
+
+    Schema final_schema(input_schema->dimentions_x, input_schema->dimentions_y);
     Schema working_schema(input_schema->dimentions_x, input_schema->dimentions_y);
 
     for (int i = 0; i < GENERATION_LENGTH; i++)
@@ -52,9 +54,10 @@ Schema Back::genetic_update(Schema* input_schema)
         working_schema.elements = individual;
         for (auto j : individual)
         {
+            int len = 0;
             for (auto k : j.connections)
             {
-                int len = A_star(&working_schema, k);
+                len += A_star(&working_schema, k);
                 if (len < 0)
                     goto label;
                 if (len < best_len)
@@ -71,16 +74,16 @@ Schema Back::genetic_update(Schema* input_schema)
     int const_gen = 0;
     while (const_gen < MAX_UNCHANGED)
     {
-        working_schema.clear_map();
         last_generation = make_generation(last_generation, input_schema->dimentions_x, input_schema->dimentions_y);
         for (auto individual : last_generation)
         {
             working_schema.elements = individual;
             for (auto element : individual)
             {
+                int len = 0;
                 for (auto connections : element.connections)
                 {
-                    int len = A_star(&working_schema, connections);
+                    len += A_star(&working_schema, connections);
                     if (len < 0)
                         goto label2;
                     if (len < best_len)
@@ -102,9 +105,13 @@ Schema Back::genetic_update(Schema* input_schema)
         }
     }
     for (auto i : best_individual)
-    {
-        working_schema.schema_map[i.coords.y][i.coords.x] = i.id;
-    }
+        for (auto j : i.connections)
+            A_star(&working_schema, j);
+
+    for (auto i: best_individual)
+        for(auto j: i.connections)
+            working_schema.schema_map[i.coords.y][i.coords.x] = i.id;
+    
     return working_schema;
 }
 
