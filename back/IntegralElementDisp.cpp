@@ -10,17 +10,22 @@ int main()
 
     
     test_schema.clear_map();
-    integral_element temp_element(0, 1, 11);
-    connection temp_connection(11, 12, 1);
-    temp_element.add_connection(temp_connection);
-    test_schema.add_element(temp_element);
+    integral_element* element = new integral_element(0, 0, 11);
+    element->add_connection(connection(11, 12, 1));
+    test_schema.add_element(*element);
+    delete element;
 
-    integral_element temp_element2(3,3, 12);
-    temp_connection = connection(12, 11, 2);
-    temp_element2.add_connection(temp_connection);
-    test_schema.add_element(temp_element2);
-    
-    Schema new_schema = Back::genetic_update(&test_schema);
+    element = new integral_element(3, 8, 12);
+    element->add_connection(connection(12, 13, 2));
+    test_schema.add_element(*element);
+    delete element;
+
+    element = new integral_element(3, 5, 13);
+    element->add_connection(connection(13, 11, 3));
+    test_schema.add_element(*element);
+    delete element;
+
+    Schema new_schema = Back::genetic_update(test_schema);
 
     for (int y = 0; y < dim_y; y++)
     {
