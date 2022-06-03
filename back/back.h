@@ -94,12 +94,8 @@ public:
     Schema* read_file(std::string filename);
     int write_file(Schema);
 
-  
-
-    static Schema genetic_update(Schema*);
-
-private:
-    static int A_star(Schema*, connection);
+    static Schema genetic_update(Schema&);
+    static int A_star(Schema&, connection);
 };
 
 Schema* Back::read_file(std::string filename) {
