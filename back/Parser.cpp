@@ -73,6 +73,7 @@ Schema Back::read_file(std::string filename) {
     }
 
     schema.schema_map = Curmap;
+
     return schema;
 
 }
@@ -108,12 +109,18 @@ int Back::write_file(Schema schema, std::string filename) {
     int ycount = 1;
     BOOST_FOREACH(std::vector<int> & row_v, schema.schema_map) {
         bool zeros = std::all_of(row_v.begin(), row_v.end(), [](int i) { return i == 0; });
-        if (zeros) continue;
+        if (zeros) {
+            ycount++;
+            continue;
+        }
         ptree& row = map.add("row", "");
         row.put("<xmlattr>.y", ycount);
         int xcount = 1;
         BOOST_FOREACH(int & col_i, row_v) {
-            if (col_i == 0) continue;
+            if (col_i == 0) {
+                xcount++;
+                continue;
+            }
             ptree& col = row.add("col", col_i);
             col.put("<xmlattr>.x", xcount);
             xcount++;
