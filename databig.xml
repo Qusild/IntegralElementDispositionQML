@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <scheme>
   <size>
     <cols>10</cols>
@@ -28,16 +28,16 @@
         <y>4</y>
       </place>
       <links>
-        <link link_id="10004">
-          <link_name>Wire Four</link_name>
+        <link link_id="10001">
+          <link_name>Wire One</link_name>
           <to>1</to>
         </link>
-        <link link_id="10005">
-          <link_name>Wire Five</link_name>
+        <link link_id="10002">
+          <link_name>Wire Two</link_name>
           <to>3</to>
         </link>
-        <link link_id="10006">
-          <link_name>Wire Six</link_name>
+        <link link_id="10003">
+          <link_name>Wire Three</link_name>
           <to>4</to>
         </link>
       </links>
@@ -50,8 +50,8 @@
         <y>4</y>
       </place>
       <links>
-        <link link_id="10005">
-          <link_name>Wire Five</link_name>
+        <link link_id="10002">
+          <link_name>Wire Two</link_name>
           <to>2</to>
         </link>
       </links>
@@ -64,8 +64,8 @@
         <y>7</y>
       </place>
       <links>
-        <link link_id="10007">
-          <link_name>Wire Seven</link_name>
+        <link link_id="10003">
+          <link_name>Wire Three</link_name>
           <to>2</to>
         </link>
       </links>
@@ -80,20 +80,20 @@
       <col x="1">10001</col>
     </row>
     <row y="3">
-      <col x="1">10002</col>
+      <col x="1">10001</col>
     </row>
     <row y="4">
-      <col x="1">10003</col>
-      <col x="2">10004</col>
+      <col x="1">10001</col>
+      <col x="2">10001</col>
       <col x="3">2</col>
-      <col x="4">10005</col>
+      <col x="4">10002</col>
       <col x="5">3</col>
     </row>
     <row y="5">
-      <col x="3">10006</col>
+      <col x="3">10003</col>
     </row>
     <row y="6">
-      <col x="3">10007</col>
+      <col x="3">10003</col>
     </row>
     <row y="7">
       <col x="3">4</col>
