@@ -1,56 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
 <scheme>
-	<size>
-		<cols>10</cols>
-		<rows>10</rows>
-		<scale>1</scale>
-	</size>
+  <size>
+    <cols>10</cols>
+    <rows>10</rows>
+    <scale>1</scale>
+  </size>
 
-	<bits>
-		<bit bit_id="1">
-			<name>Piece One</name>
-			<place>
-				<x>1</x>
-				<y>1</y>
-			</place>
-			<links>
-				<link link_id="1">
-					<link_name>Link Prime</link_name>
-					<to>2</to>
-				</link>
-			</links>
-		</bit>
+  <bits>
+    <bit bit_id="1">
+      <name>Piece One</name>
+      <place>
+        <x>1</x>
+        <y>1</y>
+      </place>
+      <links>
+        <link link_id="10001">
+          <link_name>Wire One</link_name>
+          <to>2</to>
+        </link>
+      </links>
+    </bit>
 
-		<bit bit_id="2">
-			<name>Piece Two</name>
-			<place>
-				<x>2</x>
-				<y>2</y>
-			</place>
-			<links>
-				<link link_id="1">
-					<link_name>Link Prime</link_name>
-					<to>1</to>
-				</link>
-			</links>
-		</bit>
-		
-		<bit bit_id="10001">
-			<name>Wire One</name>
-			<place>
-				<x>1</x>
-				<y>2</y>
-			</place>
-		</bit>
-	</bits>
+    <bit bit_id="2">
+      <name>Piece Two</name>
+      <place>
+        <x>2</x>
+        <y>2</y>
+      </place>
+      <links>
+        <link link_id="10001">
+          <link_name>Wire One</link_name>
+          <to>1</to>
+        </link>
+      </links>
+    </bit>
+  </bits>
 
-	<map>
-		<row y="1">
-			<col x="1">1</col>
-		</row>
-		<row y="2">
-			<col x="1">10001</col>
-			<col x="2">2</col>
-		</row>
-	</map>
+  <map>
+    <row y="1">
+      <col x="1">1</col>
+    </row>
+    <row y="2">
+      <col x="2">2</col>
+    </row>
+  </map>
 
 </scheme>
