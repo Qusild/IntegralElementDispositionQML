@@ -19,7 +19,7 @@ struct connection
 {
 public:
     connection(int ini, int fin, int id)
-        : initial(ini), final(fin), id(id){}
+        : initial(ini), final(fin), id(id) {}
     connection(int ini, int fin, int id, std::string name)
         : initial(ini), final(fin), id(id), name(name) {}
 
@@ -71,7 +71,7 @@ public:
     };
 
     int dimentions_x, dimentions_y;
-    int scale;
+    double scale;
     std::vector<integral_element> elements;
     std::vector<std::vector<int>> schema_map;
 

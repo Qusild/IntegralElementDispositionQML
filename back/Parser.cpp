@@ -9,11 +9,11 @@ Schema Back::read_file(std::string filename) {
     ptree pt;
     read_xml(filename, pt);
     ptree scheme = pt.get_child("scheme");
-
+    
     ptree sst = pt.get_child("scheme.size");
     int dim_x = sst.get<int>("cols", 0);
     int dim_y = sst.get<int>("rows", 0);
-    int scale = sst.get<int>("scale", 1);
+    double scale = sst.get<double>("scale", 1.0);
 
     Schema schema(dim_x, dim_y);
 
