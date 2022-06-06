@@ -1,6 +1,6 @@
 #include "back.h"
 #include <stack>
-
+#include <QDebug>
 inline int manhatton(int x1, int y1, int x2, int y2)
 {
     return abs(x1 - x2) + abs(y1 - y2);
@@ -11,7 +11,7 @@ inline bool is_dest(coordinates& current, coordinates& dest)
     return current == dest;
 }
 
-int is_invalid(Schema& schema, coordinates place)
+bool is_invalid(Schema& schema, coordinates place)
 {
     int retval = 0;
     if (place.x < 0 || place.y < 0 || place.x > schema.dimentions_x - 1 || place.y >schema.dimentions_y - 1)
@@ -28,7 +28,7 @@ int is_invalid(Schema& schema, coordinates place)
     retval <<= 1;
     retval ^= place.y >= schema.dimentions_y;
     retval <<= 10;
-    return -retval;
+    return retval>0;
 }
 
 int alg_redo(Schema& schema, connection conn);
@@ -36,15 +36,16 @@ int alg_redo(Schema& schema, connection conn);
 int Back::A_star(Schema& schema, connection conn)
 {
     integral_element* start = schema.find(conn.initial);
+
+    //if (!start) return -10000;
     schema.schema_map[start->coords.y][start->coords.x] = start->id;
     integral_element* end = schema.find(conn.final);
+    //if (!end) return -10001;
     schema.schema_map[end->coords.y][end->coords.x] = end->id;
 
-
-    Schema schem = schema;
+    Schema schem(schema);
     int right = alg_redo(schem, conn);
-    
-    Schema schem2 = schema;
+    Schema schem2(schema);
     connection connect(conn.final, conn.initial, conn.id);
     int inverse = alg_redo(schem2, connect);
     if (right < inverse && right > 0)
@@ -60,10 +61,12 @@ int Back::A_star(Schema& schema, connection conn)
     return -10000;
 }
 
+
 int alg_redo(Schema& schema, connection conn)
 {
 
     integral_element* start = schema.find(conn.initial);
+
     if (!start) return -10000;
     coordinates starting_coord = start->coords;
 
@@ -83,8 +86,9 @@ int alg_redo(Schema& schema, connection conn)
         int best_path = INT_MAX;
         int choice = 0;
         int p = manhatton(current_place.x, current_place.y - 1, ending_coord.x, ending_coord.y);
+
         coordinates next_place(current_place.x, current_place.y - 1);
-        if (!is_invalid(schema, next_place) && p + current_path < best_path
+        if ((!is_invalid(schema, next_place) && p + current_path < best_path)
             || is_dest(next_place, ending_coord))
         {
             best_path = p + current_path;
@@ -92,7 +96,7 @@ int alg_redo(Schema& schema, connection conn)
         }
         p = manhatton(current_place.x + 1, current_place.y, ending_coord.x, ending_coord.y);
         next_place = coordinates(current_place.x + 1, current_place.y);
-        if (!is_invalid(schema, next_place) && p + current_path < best_path
+        if ((!is_invalid(schema, next_place) && p + current_path < best_path)
             || is_dest(next_place, ending_coord))
         {
             best_path = p + current_path;
@@ -100,7 +104,7 @@ int alg_redo(Schema& schema, connection conn)
         }
         p = manhatton(current_place.x, current_place.y + 1, ending_coord.x, ending_coord.y);
         next_place = coordinates(current_place.x, current_place.y + 1);
-        if (!is_invalid(schema, next_place) && p + current_path < best_path
+        if ((!is_invalid(schema, next_place) && p + current_path < best_path)
             || is_dest(next_place, ending_coord))
         {
             best_path = p + current_path;
@@ -108,7 +112,7 @@ int alg_redo(Schema& schema, connection conn)
         }
         p = manhatton(current_place.x - 1, current_place.y, ending_coord.x, ending_coord.y);
         next_place = coordinates(current_place.x - 1, current_place.y);
-        if (!is_invalid(schema, next_place) && p + current_path < best_path
+        if ((!is_invalid(schema, next_place) && p + current_path < best_path)
             || is_dest(next_place, ending_coord))
         {
             best_path = p + current_path;
@@ -121,20 +125,24 @@ int alg_redo(Schema& schema, connection conn)
             schema.schema_map[current_place.y - 1][current_place.x] = conn.id;
             current_place = coordinates(current_place.x, current_place.y - 1);
             current_path += 1;
+
             break;
         case 2:
             schema.schema_map[current_place.y][current_place.x + 1] = conn.id;
             current_place = coordinates(current_place.x + 1, current_place.y);
             current_path += 1;
+
             break;
         case 3:
             schema.schema_map[current_place.y + 1][current_place.x] = conn.id;
             current_place = coordinates(current_place.x, current_place.y + 1);
             current_path += 1;
+
             break;
         case 4:
             schema.schema_map[current_place.y][current_place.x - 1] = conn.id;
             current_path += 1;
+
             current_place = coordinates(current_place.x - 1, current_place.y);
             break;
         default:
@@ -147,9 +155,18 @@ int alg_redo(Schema& schema, connection conn)
 
 integral_element* Schema::find(int id)
 {
-    for (integral_element i : elements)
-        if (i.id == id)
-            return &i;
+    for (uint i =0;i<elements.size();i++)
+        if (this->elements[i].id == id)
+            return &elements[i];
+    return nullptr;
+}
+
+connection *Schema::find_con(int id)
+{
+    for (uint i =0;i<elements.size();i++)
+        for (uint j = 0;j<elements[i].connections.size();j++)
+            if (this->elements[i].connections[j].id == id)
+            return &elements[i].connections[j];
     return nullptr;
 }
 
