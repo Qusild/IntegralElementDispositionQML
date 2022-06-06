@@ -255,6 +255,14 @@ void Schema::delConnection(int init, int fin)
                     startUpdate();
                     return;
                 }
+                        tmp = find(fin);
+            for (uint i = 0;i<tmp->connections.size();i++)
+                if (tmp->connections[i].final == init)
+                {
+                    tmp->remove_connection(tmp->connections[i]);
+                    startUpdate();
+                    return;
+                }
     }
 }
 
